@@ -20,9 +20,11 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libgl1 libglx-mesa0 libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev libosmesa6 libosmesa6-dev libgles2-mesa-dev libarchive-dev libpangocairo-1.0-0
+          sudo apt-get install -y libgl1 libglx-mesa0 libgl1-mesa-dev libglu1-mesa-dev \
+                                  freeglut3-dev libosmesa6 libosmesa6-dev libgles2-mesa-dev \
+                                  libarchive-dev libpangocairo-1.0-0 xvfb
 
-      - name: checkout actions
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -30,23 +32,26 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           python -m pip install .
           python -c "import paramak"
 
-      - name: Test with pytest
+      - name: Run pytest
         run: |
           python -m pip install .[tests]
           pytest -v
-          python examples/plasma.py
-          python examples/spherical_tokamak_from_plasma_minimal.py
-          python examples/spherical_tokamak_from_plasma_with_divertor.py
-          python examples/spherical_tokamak_from_plasma_with_pf_magnets_and_divertors.py
-          python examples/spherical_tokamak_from_plasma_with_pf_magnets.py
-          python examples/spherical_tokamak_from_plasma_with_tf_magnets.py
-          python examples/spherical_tokamak_minimal.py
-          python examples/tokamak_from_plasma_with_divertor.py
-          python examples/tokamak_minimal.py
-          python examples/tokamak_from_plasma_minimal.py
 
+      - name: Run examples (offscreen)
+        run: |
+          xvfb-run -a python examples/plasma.py
+          xvfb-run -a python examples/spherical_tokamak_from_plasma_minimal.py
+          xvfb-run -a python examples/spherical_tokamak_from_plasma_with_divertor.py
+          xvfb-run -a python examples/spherical_tokamak_from_plasma_with_pf_magnets_and_divertors.py
+          xvfb-run -a python examples/spherical_tokamak_from_plasma_with_pf_magnets.py
+          xvfb-run -a python examples/spherical_tokamak_from_plasma_with_tf_magnets.py
+          xvfb-run -a python examples/spherical_tokamak_minimal.py
+          xvfb-run -a python examples/tokamak_from_plasma_with_divertor.py
+          xvfb-run -a python examples/tokamak_minimal.py
+          xvfb-run -a python examples/tokamak_from_plasma_minimal.py
