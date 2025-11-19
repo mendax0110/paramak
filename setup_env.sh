@@ -3,7 +3,7 @@ set -e
 
 echo "=== Paramak Environment Setup ==="
 
-PYTHON_VERSION="3.11"
+PYTHON_VERSION="3.12"
 ENV_DIR=".venv"
 OPENMC_SRC="$HOME/openmc-src"
 START_DIR=$(pwd)
@@ -48,6 +48,7 @@ while true; do
     echo "4) Build documentation"
     echo "5) Run examples"
     echo "6) Install Paramak in dev mode"
+    echo "7) Delete venv"
     echo "0) Exit"
     read -p "Choose an option: " choice
 
@@ -107,6 +108,10 @@ while true; do
         6)
             echo "Installing Paramak in editable dev mode..."
             uv add --dev .
+            ;;
+        7)
+            echo "Removing the virutal environment"
+            rm -rf .venv
             ;;
         0)
             echo "Exiting."

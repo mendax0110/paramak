@@ -16,8 +16,8 @@ authors = [
   { name="The Paramak Development Team" },
 ]
 license = {file = "LICENSE.txt"}
-requires-python = ">=3.9, <3.12"
-keywords = ["python", "geometry", "reactor", "model", "cad", "fusion", "parametric", "dagmc"]
+requires-python = ">=3.9, <3.13"
+keywords = ["python", "geometry", "reactor", "model", "cad", "fusion", "parametric", "dagmc", "openmc"]
 dependencies = [
     "cadquery>=2.5.2",
     "numpy",
@@ -66,6 +66,7 @@ package-dir = {"" = "src"}
 
 [tool.uv.workspace]
 members = [
+    ".",
     ".",
     ".",
     ".",
