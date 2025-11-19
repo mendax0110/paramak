@@ -1,5 +1,6 @@
 import paramak
 import cadquery as cq
+from cadquery import exporters
 
 # makes a rectangle that overlaps the lower blanket under the plasma
 # the intersection of this and the layers will form the lower divertor
@@ -71,5 +72,7 @@ my_reactor = paramak.tokamak(
     extra_cut_shapes=extra_cut_shapes,
     extra_intersect_shapes=[divertor_lower],
 )
-my_reactor.save(f"tokamak_with_divertor.step")
-print(f"Saved as tokamak_with_divertor.step")
+
+compound = my_reactor.toCompound()
+exporters.export(compound, "tokamak_with_divertor.step")
+print("Saved as tokamak_with_divertor.step")

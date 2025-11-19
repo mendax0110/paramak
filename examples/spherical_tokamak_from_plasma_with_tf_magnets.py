@@ -1,7 +1,8 @@
 import paramak
-
+from cadquery import exporters
 
 rotation_angle = 90
+
 tf_style_1 = paramak.toroidal_field_coil_rectangle(
     horizontal_start_point=(10, 520),
     vertical_mid_point=(600, 0),
@@ -30,8 +31,7 @@ result1 = paramak.spherical_tokamak_from_plasma(
     extra_cut_shapes=[tf_style_1],
 )
 
-result1.save("spherical_tokamak_from_plasma_with_rect_tf_coils.step")
-
+exporters.export(result1.toCompound(), "spherical_tokamak_from_plasma_with_rect_tf_coils.step")
 
 tf_style_2 = paramak.toroidal_field_coil_princeton_d(
     r1=5,
@@ -60,4 +60,4 @@ result2 = paramak.spherical_tokamak_from_plasma(
     extra_cut_shapes=[tf_style_2],
 )
 
-result2.save("spherical_tokamak_from_plasma_with_prin_tf_coils.step")
+exporters.export(result2.toCompound(), "spherical_tokamak_from_plasma_with_prin_tf_coils.step")

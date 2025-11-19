@@ -1,3 +1,4 @@
+from cadquery import exporters
 import paramak
 
 extra_cut_shapes = []
@@ -17,7 +18,6 @@ for case_thickness, height, width, center_point in zip(
         )
     )
 
-
 my_reactor = paramak.spherical_tokamak_from_plasma(
     radial_build=[
         (paramak.LayerType.GAP, 10),
@@ -35,4 +35,7 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
     rotation_angle=270,
     extra_cut_shapes=extra_cut_shapes,
 )
-my_reactor.save(f"spherical_tokamak_from_plasma_with_pf_magnets.step")
+
+compound = my_reactor.toCompound()
+exporters.export(compound, "spherical_tokamak_from_plasma_with_pf_magnets.step")
+print("STEP file written.")

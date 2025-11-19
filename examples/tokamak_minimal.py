@@ -1,4 +1,5 @@
 import paramak
+from cadquery import exporters
 
 my_reactor = paramak.tokamak(
     radial_build=[
@@ -30,5 +31,8 @@ my_reactor = paramak.tokamak(
     rotation_angle=180,
 )
 
-my_reactor.save(f"tokamak_minimal.step")
-print(f"Saved as tokamak_minimal.step")
+compound = my_reactor.toCompound()
+
+exporters.export(compound, "tokamak_minimal.step")
+
+print("Saved as tokamak_minimal.step")

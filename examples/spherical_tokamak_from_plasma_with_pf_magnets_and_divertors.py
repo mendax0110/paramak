@@ -1,3 +1,4 @@
+from cadquery import exporters
 import paramak
 
 rotation_angle = 180
@@ -20,8 +21,6 @@ for case_thickness, height, width, center_point in zip(
         )
     )
 
-# TODO
-# [(paramak.LayerType.GAP, 75), ("lower_divertor", 100)],
 my_reactor = paramak.spherical_tokamak_from_plasma(
     radial_build=[
         (paramak.LayerType.GAP, 10),
@@ -39,4 +38,7 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
     rotation_angle=rotation_angle,
     extra_cut_shapes=poloidal_field_coils,
 )
-my_reactor.save(f"spherical_tokamak_from_plasma_with_pf_magnets_and_divertor.step")
+
+compound = my_reactor.toCompound()
+exporters.export(compound, "spherical_tokamak_from_plasma_with_pf_magnets_and_divertor.step")
+print("STEP file written.")

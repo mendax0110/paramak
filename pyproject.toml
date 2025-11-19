@@ -16,28 +16,24 @@ authors = [
   { name="The Paramak Development Team" },
 ]
 license = {file = "LICENSE.txt"}
-requires-python = ">=3.8"
-keywords = ["python", "geometry", "reactor", "model", "cad", "fusion", "parametric", "dagmc", "openmc"]
+requires-python = ">=3.9, <3.12"
+keywords = ["python", "geometry", "reactor", "model", "cad", "fusion", "parametric", "dagmc"]
 dependencies = [
     "cadquery>=2.5.2",
     "numpy",
     "mpmath",
     "sympy",
     "scipy",
+    "cadquery_png_plugin"
 ]
-
-[project.urls]
-"Homepage" = "https://github.com/fusion-energy/paramak"
-"Bug Tracker" = "https://github.com/fusion-energy/paramak/issues"
-"Documentation" = "https://fusion-energy.github.io/paramak"
-
 
 [project.optional-dependencies]
 tests = [
     "pytest>=5.4.3",
     "pytest-cov>=2.12.1",
     "dagmc_h5m_file_inspector>=0.5.0",
-    "openmc_data_downloader"
+    "openmc_data_downloader",
+    "paramak"
 ]
 docs = [
     "sphinx_autodoc_typehints",
@@ -51,6 +47,14 @@ docs = [
     "setuptools",
 ]
 
+[project.urls]
+"Homepage" = "https://github.com/fusion-energy/paramak"
+"Bug Tracker" = "https://github.com/fusion-energy/paramak/issues"
+"Documentation" = "https://fusion-energy.github.io/paramak"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+
 [tool.black]
 line-length = 120
 
@@ -59,3 +63,19 @@ write_to = "src/_version.py"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.uv.workspace]
+members = [
+    ".",
+    ".",
+    ".",
+    ".",
+]
+
+[tool.uv.sources]
+paramak = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "paramak",
+]

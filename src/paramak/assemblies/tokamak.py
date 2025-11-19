@@ -62,7 +62,7 @@ def create_center_column_shield_cylinders(radial_build, rotation_angle, center_c
 
 def distance_to_plasma(radial_build, index):
     distance = 0
-    for item in radial_build[index + 1 :]:
+    for item in radial_build[index + 1:]:
         if item[0] == LayerType.PLASMA:
             break
         distance += item[1]
@@ -70,9 +70,9 @@ def distance_to_plasma(radial_build, index):
 
 
 def create_layers_from_plasma(
-    radial_build, vertical_build, minor_radius, major_radius, triangularity, elongation, rotation_angle, center_column
+        radial_build, vertical_build, minor_radius, major_radius, triangularity, elongation, rotation_angle,
+        center_column
 ):
-
     plasma_index_rb = get_plasma_index(radial_build)
     plasma_index_vb = get_plasma_index(vertical_build)
     indexes_from_plamsa_to_end = len(radial_build) - plasma_index_rb
@@ -151,13 +151,13 @@ def create_layers_from_plasma(
 
 
 def tokamak_from_plasma(
-    radial_build: Sequence[Tuple[LayerType, float]],
-    elongation: float = 2.0,
-    triangularity: float = 0.55,
-    rotation_angle: float = 180.0,
-    extra_cut_shapes: Sequence[cq.Workplane] = [],
-    extra_intersect_shapes: Sequence[cq.Workplane] = [],
-    colors: dict = {}
+        radial_build: Sequence[Tuple[LayerType, float]],
+        elongation: float = 2.0,
+        triangularity: float = 0.55,
+        rotation_angle: float = 180.0,
+        extra_cut_shapes=None,
+        extra_intersect_shapes=None,
+        colors=None
 ) -> Assembly:
     """
     Creates a tokamak fusion reactor from a radial build and plasma parameters.
@@ -179,6 +179,12 @@ def tokamak_from_plasma(
         CadQuery.Assembly: A CadQuery Assembly object representing the tokamak fusion reactor.
     """
 
+    if colors is None:
+        colors = {}
+    if extra_intersect_shapes is None:
+        extra_intersect_shapes = []
+    if extra_cut_shapes is None:
+        extra_cut_shapes = []
     inner_equatorial_point = sum_up_to_plasma(radial_build)
     plasma_radial_thickness = get_plasma_value(radial_build)
     outer_equatorial_point = inner_equatorial_point + plasma_radial_thickness
@@ -192,7 +198,7 @@ def tokamak_from_plasma(
     # make vertical build from inner radial build
     pi = get_plasma_index(radial_build)
     rbi = len(radial_build) - 1 - pi  # number of unique entries in outer or inner radial build
-    upper_vertical_build = radial_build[pi - rbi : pi][::-1]  # get the inner radial build
+    upper_vertical_build = radial_build[pi - rbi: pi][::-1]  # get the inner radial build
 
     plasma_height = 2 * minor_radius * elongation
     # slice opperation reverses the list and removes the last value to avoid two plasmas
@@ -210,13 +216,13 @@ def tokamak_from_plasma(
 
 
 def tokamak(
-    radial_build: Sequence[Tuple[str, float]],
-    vertical_build: Sequence[Tuple[str, float]],
-    triangularity: float = 0.55,
-    rotation_angle: float = 180.0,
-    extra_cut_shapes: Sequence[cq.Workplane] = [],
-    extra_intersect_shapes: Sequence[cq.Workplane] = [],
-    colors: dict = {}
+        radial_build: Sequence[Tuple[str, float]],
+        vertical_build: Sequence[Tuple[str, float]],
+        triangularity: float = 0.55,
+        rotation_angle: float = 180.0,
+        extra_cut_shapes=None,
+        extra_intersect_shapes=None,
+        colors=None
 ) -> Assembly:
     """
     Creates a tokamak fusion reactor from a radial and vertical build.
@@ -239,6 +245,12 @@ def tokamak(
         CadQuery.Assembly: A CadQuery Assembly object representing the tokamak fusion reactor.
     """
 
+    if colors is None:
+        colors = {}
+    if extra_intersect_shapes is None:
+        extra_intersect_shapes = []
+    if extra_cut_shapes is None:
+        extra_cut_shapes = []
     inner_equatorial_point = sum_up_to_plasma(radial_build)
     plasma_radial_thickness = get_plasma_value(radial_build)
     plasma_vertical_thickness = get_plasma_value(vertical_build)
@@ -277,8 +289,8 @@ def tokamak(
 
     for i, entry in enumerate(extra_cut_shapes):
         if isinstance(entry, cq.Workplane):
-            name = f"add_extra_cut_shape_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"add_extra_cut_shape_{i + 1}"
+            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5))))
         else:
             raise ValueError(f"extra_cut_shapes should only contain cadquery Workplanes, not {type(entry)}")
 
@@ -298,31 +310,43 @@ def tokamak(
         for i, entry in enumerate(extra_intersect_shapes):
             reactor_entry_intersection = entry.intersect(reactor_compound)
             intersect_shapes_to_cut.append(reactor_entry_intersection)
-            name=f"extra_intersect_shapes_{i+1}"
-            my_assembly.add(reactor_entry_intersection, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+            name = f"extra_intersect_shapes_{i + 1}"
+            my_assembly.add(reactor_entry_intersection, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5))))
 
-    # builds just the core if there are no extra parts
-    if len(extra_cut_shapes) == 0 and len(intersect_shapes_to_cut) == 0:
-        for i, entry in enumerate(inner_radial_build+blanket_layers):
-            name=f"layer_{i+1}"
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
-    else:
-        shapes_and_components = []
-        for i, entry in enumerate(inner_radial_build + blanket_layers):
-            for cutter in extra_cut_shapes + extra_intersect_shapes:
-                entry = entry.cut(cutter)
-                # TODO use something like this to return a list of material tags for the solids in order, as some solids get split into multiple
-                # for subentry in entry.objects:
-                #     print(i, subentry)
-            shapes_and_components.append(entry)
+            shapes_and_components = []
+            if extra_cut_shapes or intersect_shapes_to_cut:
+                for i, entry in enumerate(inner_radial_build + blanket_layers):
+                    combined_cutters = extra_cut_shapes + intersect_shapes_to_cut
+                    if combined_cutters:
+                        # Cut the entry with all cutters
+                        for cutter in combined_cutters:
+                            entry = entry.cut(cutter)
 
-        for i, entry in enumerate(shapes_and_components):
-            name=f"layer_{i+1}"
-            # TODO track the names of shapes, even when extra shapes are made due to splitting
-            my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5,0.5,0.5))))
+                # Handle sub-shapes after cuts or intersections
+                if hasattr(entry, 'solids'):
+                    solids_list = list(entry.solids())  # convert generator to list
+                    if len(solids_list) > 1:
+                        for j, subentry in enumerate(solids_list):
+                            name = f"layer_{i + 1}_part_{j + 1}"
+                            my_assembly.add(
+                                subentry,
+                                name=name,
+                                color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+                            )
+                    else:
+                        name = f"layer_{i + 1}"
+                        my_assembly.add(
+                            solids_list[0] if solids_list else entry,
+                            name=name,
+                            color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5)))
+                        )
+                else:
+                    name = f"layer_{i + 1}"
+                    my_assembly.add(entry, name=name, color=cq.Color(*colors.get(name, (0.5, 0.5, 0.5))))
 
-    my_assembly.add(plasma, name="plasma", color=cq.Color(*colors.get("plasma", (0.5,0.5,0.5))))
+                shapes_and_components.append(entry)
 
+    # Stores tokamak parameters in the assembly for reference
     my_assembly.elongation = elongation
     my_assembly.triangularity = triangularity
     my_assembly.major_radius = major_radius

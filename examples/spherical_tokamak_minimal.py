@@ -1,4 +1,5 @@
 import paramak
+from cadquery import exporters
 
 my_reactor = paramak.spherical_tokamak(
     radial_build=[
@@ -26,4 +27,5 @@ my_reactor = paramak.spherical_tokamak(
     rotation_angle=180,
     triangularity=-0.55,
 )
-my_reactor.save(f"spherical_tokamak_minimal.step")
+
+exporters.export(my_reactor.toCompound(), "spherical_tokamak_minimal.step")

@@ -1,4 +1,10 @@
 import paramak
+from cadquery import exporters
+import cadquery_png_plugin.plugin
+from cadquery import Workplane
+
+points = [(150, -700), (150, 0), (270, 0), (270, -700)]
+divertor_lower = Workplane("XZ", origin=(0, 0, 0)).polyline(points).close().revolve(180)
 
 my_reactor = paramak.spherical_tokamak_from_plasma(
     radial_build=[
@@ -15,38 +21,33 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
     elongation=2,
     triangularity=0.55,
     rotation_angle=180,
+    extra_intersect_shapes=[divertor_lower],
     colors={
         "layer_1": (0.4, 0.9, 0.4),
         "layer_2": (0.6, 0.8, 0.6),
-        "plasma": (1., 0.7, 0.8, 0.6),
+        "plasma": (1.0, 0.7, 0.8, 0.6),
         "layer_3": (0.1, 0.1, 0.9),
         "layer_4": (0.4, 0.4, 0.8),
         "layer_5": (0.5, 0.5, 0.8),
-    },
+        "divertor_lower": (1.0, 0.5, 0.0),
+    }
 )
-my_reactor.save(f"spherical_tokamak_from_plasma_with_colors.step")
 
-# show colors with inbuild vtk viewer
-# from cadquery.vis import show
-# show(my_reactor)
+compound = my_reactor.toCompound()
 
-# cadquery also supports svg export
-# currently needs converting to compound first as svg export not supported by assembly objects
-# lots of options https://cadquery.readthedocs.io/en/latest/importexport.html#exporting-svg
-my_reactor.toCompound().export("spherical_tokamak_from_plasma_with_colors.svg")
+exporters.export(compound, "spherical_tokamak_from_plasma_with_divertor.step")
+print("STEP file written.")
 
-# show colors with png file export
-# first install plugin with
-# pip install git+https://github.com/jmwright/cadquery-png-plugin
-import cadquery_png_plugin.plugin
-# lots of options
-# https://github.com/jmwright/cadquery-png-plugin/blob/d2dd6e8a51b7e165ee80240a701c5b434dfe0733/cadquery_png_plugin/plugin.py#L276-L298
 my_reactor.exportPNG(
+    file_path="spherical_tokamak_from_plasma_with_divertor.png",
     options={
-        "width":1280,
-        "height":1024,
-        "zoom":1.4,
-    },
-    file_path='spherical_tokamak_from_plasma_with_colors.png'
+        "width": 1280,
+        "height": 1024,
+        "zoom": 1.4,
+        "background_color": (1, 1, 1)  # white background
+    }
 )
+print("PNG file written.")
 
+exporters.export(compound, "spherical_tokamak_from_plasma_with_divertor.svg", exportType="SVG")
+print("SVG file written.")

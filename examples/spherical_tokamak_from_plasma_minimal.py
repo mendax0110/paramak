@@ -1,6 +1,6 @@
 from pathlib import Path
-
 import paramak
+from cadquery import exporters
 
 my_reactor = paramak.spherical_tokamak_from_plasma(
     radial_build=[
@@ -18,4 +18,8 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
     triangularity=0.55,
     rotation_angle=180,
 )
-my_reactor.save(f"spherical_tokamak_from_plasma_minimal.step")
+
+compound = my_reactor.toCompound()
+
+exporters.export(compound, "spherical_tokamak_from_plasma_minimal.step")
+print("STEP file written.")

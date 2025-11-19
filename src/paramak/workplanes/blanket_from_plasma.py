@@ -155,8 +155,8 @@ def create_offset_points(
 
     for theta in thetas:
         # get local value of derivatives
-        val_R_derivative = float(R_derivative.subs("theta", theta))
-        val_Z_derivative = float(Z_derivative.subs("theta", theta))
+        val_R_derivative = float(R_derivative.subs("theta", float(theta)).evalf())
+        val_Z_derivative = float(Z_derivative.subs("theta", float(theta)).evalf())
 
         # get normal vector components
         nx = val_Z_derivative
@@ -243,6 +243,7 @@ def blanket_from_plasma(
     obj=None,
     allow_overlapping_shape=False,
     connect_to_center=False,
+    create_solid: bool = True,
 ):
     """A blanket volume created from plasma parameters. In might be nessecary
     to increase the num_points when making long but thin geometry with this
@@ -294,9 +295,18 @@ def blanket_from_plasma(
     )
     points.append(points[0])
 
+    points = [[float(p[0]), float(p[1]), p[2]] for p in points]
+
     wire = create_wire_workplane_from_points(points=points, plane=plane, origin=origin, obj=obj)
 
-    solid = wire.revolve(rotation_angle)
-    solid.name = name
-    solid.color = color
-    return solid
+    if create_solid:
+        try:
+            solid = wire.revolve(rotation_angle)
+            solid.name = name
+            solid.color = color
+            return solid
+        except Exception as e:
+            warnings.warn(f"Could not create solid: {e}", UserWarning)
+            return wire
+    else:
+        return wire

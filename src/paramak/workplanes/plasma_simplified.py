@@ -36,7 +36,7 @@ def plasma_simplified(
     """
 
     # create array of angles theta
-    theta = np.linspace(0, 2 * np.pi, num=num_points, endpoint=False)
+    theta = np.linspace(0, 2 * np.pi, num=int(num_points), endpoint=False)
 
     # parametric equations for plasma
     def R(theta):
@@ -54,11 +54,11 @@ def plasma_simplified(
 
     # avoids shape with surface on join that can't be meshed for 360 degree plasmas
     if rotation_angle >= 360:
-        solid1 = wire.revolve(180, (1, 0, 0), (1, 1, 0))
-        solid2 = solid1.mirror(solid1.faces(">X"), union=True)
-        solid = solid2.union(solid1)  # todo try fuzzy bool tol=0.01
+        solid1 = wire.revolve(180, (1, 0, 0), (1, 1, 0)).val()
+        solid2 = solid1.mirror("YZ")
+        solid = solid1.fuse(solid2, tol=0.01)
     else:
-        solid = wire.revolve(rotation_angle)
+        solid = wire.revolve(rotation_angle).val()
     solid.name = name
     solid.color = color
     return solid
