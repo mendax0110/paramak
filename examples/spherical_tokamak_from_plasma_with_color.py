@@ -35,11 +35,11 @@ my_reactor = paramak.spherical_tokamak_from_plasma(
 
 compound = my_reactor.toCompound()
 
-exporters.export(compound, "spherical_tokamak_from_plasma_with_divertor.step")
+exporters.export(compound, "spherical_tokamak_from_plasma_with_color.step")
 print("STEP file written.")
 
 my_reactor.exportPNG(
-    file_path="spherical_tokamak_from_plasma_with_divertor.png",
+    file_path="spherical_tokamak_from_plasma_with_color.png",
     options={
         "width": 1280,
         "height": 1024,
@@ -49,5 +49,5 @@ my_reactor.exportPNG(
 )
 print("PNG file written.")
 
-exporters.export(compound, "spherical_tokamak_from_plasma_with_divertor.svg", exportType="SVG")
+exporters.export(compound, "spherical_tokamak_from_plasma_with_color.svg", exportType="SVG")
 print("SVG file written.")

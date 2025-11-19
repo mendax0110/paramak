@@ -34,7 +34,7 @@ my_reactor = paramak.tokamak_from_plasma(
 
 exporters.export(
     my_reactor.toCompound(),
-    "tokamak_with_divertor.step"
+    "tokamak_from_plasma_with_divertor.step"
 )
 
-print("Saved tokamak_with_divertor.step")
+print("Saved tokamak_from_plasma_with_divertor.step")

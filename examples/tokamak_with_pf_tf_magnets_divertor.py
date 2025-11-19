@@ -74,5 +74,5 @@ my_reactor = paramak.tokamak(
 )
 
 compound = my_reactor.toCompound()
-exporters.export(compound, "tokamak_with_divertor.step")
-print("Saved as tokamak_with_divertor.step")
+exporters.export(compound, "tokamak_with_pf_tf_magnets_divertor.step")
+print("Saved as tokamak_with_pf_tf_magnets_divertor.step")

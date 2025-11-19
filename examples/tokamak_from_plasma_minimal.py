@@ -21,5 +21,5 @@ my_reactor = paramak.tokamak_from_plasma(
     rotation_angle=180,
 )
 
-exporters.export(my_reactor.toCompound(), "tokamak_minimal.step")
-print("Saved as tokamak_minimal.step")
+exporters.export(my_reactor.toCompound(), "tokamak_from_plasma_minimal.step")
+print("Saved as tokamak_from_plasma_minimal.step")
